@@ -81,6 +81,16 @@
         .pulse {
             animation: pulse 0.5s ease-in-out;
         }
+        
+        /* Alarm Animation */
+        @keyframes alarm {
+            0%, 100% { background-color: #ffffff; }
+            50% { background-color: #fff0f0; }
+        }
+        
+        .alarm-active {
+            animation: alarm 0.5s infinite;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -238,7 +248,7 @@
                 <div class="mt-4">
                     <label class="block mb-2 text-gray-700 font-medium">
                         Clock Size: <span id="clock-size-value">120</span>px
-                    </label>
+                        </label>
                     <input 
                         type="range" 
                         id="clock-font-size" 
@@ -306,13 +316,43 @@
                         >
                     </div>
                 </div>
+                
+                <!-- Alarm Sound Selection -->
+                <div class="mt-6">
+                    <label class="block mb-2 text-gray-700 font-medium">Alarm Sound</label>
+                    <select 
+                        id="alarm-sound-select" 
+                        class="w-full p-3 border border-gray-300 rounded-lg focus:border-red-500 focus:ring-2 focus:ring-red-200 transition"
+                    >
+                        <option value="1" selected>Classic Alarm</option>
+                        <option value="2">Beep Beep</option>
+                        <option value="3">Digital Chime</option>
+                        <option value="4">Bell Ring</option>
+                        <option value="5">Custom Sound</option>
+                    </select>
+                    
+                    <!-- Custom Alarm Upload -->
+                    <div id="custom-alarm-upload-container" class="hidden mt-4 p-4 bg-gray-100 rounded-lg">
+                        <label class="block mb-2 text-gray-700 font-medium">Upload Custom Alarm (.mp3, .wav)</label>
+                        <input type="file" id="custom-alarm-upload" accept=".mp3,.wav" class="hidden">
+                        <label for="custom-alarm-upload" class="cursor-pointer inline-flex items-center bg-white border border-red-500 text-red-600 px-4 py-2 rounded-lg hover:bg-red-50 transition">
+                            <i class="fas fa-upload mr-2"></i> Choose Sound File
+                        </label>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
     <!-- Audio Elements -->
     <audio id="tick-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-tick-tock-clock-timer-1045.mp3" preload="auto"></audio>
-    <audio id="alarm-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
+    
+    <!-- Multiple Alarm Sounds -->
+    <audio id="alarm-sound-1" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
+    <audio id="alarm-sound-2" src="https://assets.mixkit.co/sfx/preview/mixkit-interface-hint-notification-911.mp3" preload="auto"></audio>
+    <audio id="alarm-sound-3" src="https://assets.mixkit.co/sfx/preview/mixkit-digital-clock-digital-alarm-buzzer-992.mp3" preload="auto"></audio>
+    <audio id="alarm-sound-4" src="https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3" preload="auto"></audio>
+    <audio id="custom-alarm-sound" preload="auto"></audio>
 
     <script>
         // Load fonts dynamically
@@ -332,6 +372,7 @@
         let isRunning = false;
         let currentTimeFormat = 'hh:mm:ss';
         let customFonts = {};
+        let alarmSound = document.getElementById('alarm-sound-1');
 
         // DOM Elements
         const titleElement = document.getElementById('countdown-title');
@@ -340,12 +381,11 @@
         const toggleBtn = document.getElementById('settings-toggle');
 
         // Timer Functions
-        function updateDisplay() {
+               function updateDisplay() {
             const hours = Math.floor(remainingSeconds / 3600);
             const minutes = Math.floor((remainingSeconds % 3600) / 60);
             const seconds = remainingSeconds % 60;
             
-            // Update clock display based on selected format
             if (currentTimeFormat === 'hh:mm:ss') {
                 document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
                 document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
@@ -366,7 +406,6 @@
                 document.querySelectorAll('.colon').forEach(el => el.style.display = 'none');
             }
             
-            // Only update seconds display for hh:mm:ss and mm:ss formats
             if (currentTimeFormat !== 'ss') {
                 document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
                 document.querySelectorAll('.colon')[1].style.display = 'inline';
@@ -394,6 +433,9 @@
             document.getElementById('pause-btn').disabled = false;
             document.getElementById('complete-message').classList.add('hidden');
             
+            // Remove any previous alarm effects
+            document.body.classList.remove('alarm-active');
+            
             isRunning = true;
             updateDisplay();
             
@@ -413,7 +455,7 @@
                     isRunning = false;
                     timerComplete();
                 }
-                        }, 1000);
+            }, 1000);
         }
 
         function pauseTimer() {
@@ -424,7 +466,7 @@
             document.getElementById('start-btn').disabled = false;
             document.getElementById('pause-btn').disabled = true;
             
-            // Add slight visual feedback
+            // Add visual feedback
             clockElement.classList.add('pulse');
             setTimeout(() => clockElement.classList.remove('pulse'), 500);
         }
@@ -436,26 +478,79 @@
             updateDisplay();
             document.getElementById('complete-message').classList.add('hidden');
             
+            // Stop any currently playing alarm
+            alarmSound.pause();
+            alarmSound.currentTime = 0;
+            document.body.classList.remove('alarm-active');
+            
             // Show settings panel when resetting
             settingsPanel.classList.remove('hidden');
         }
 
         function timerComplete() {
-            // Play alarm sound
-            const alarm = document.getElementById('alarm-sound');
-            alarm.currentTime = 0;
-            alarm.play();
-            
             // Show completion message
             document.getElementById('complete-message').classList.remove('hidden');
             
             // Enable start button
             document.getElementById('start-btn').disabled = false;
             
-            // Visual feedback
-            clockElement.classList.add('pulse');
-            setTimeout(() => clockElement.classList.remove('pulse'), 1000);
+            // Play alarm sound
+            alarmSound.currentTime = 0;
+            alarmSound.play();
+            
+            // Visual feedback - flash background
+            document.body.classList.add('alarm-active');
+            
+            // Stop alarm after 5 seconds
+            setTimeout(() => {
+                alarmSound.pause();
+                document.body.classList.remove('alarm-active');
+            }, 5000);
         }
+
+        // Alarm Sound Selection
+        document.getElementById('alarm-sound-select').addEventListener('change', function() {
+            const soundOption = this.value;
+            
+            // Hide custom upload unless "Custom Sound" is selected
+            document.getElementById('custom-alarm-upload-container').classList.toggle('hidden', soundOption !== '5');
+            
+            // Set the appropriate alarm sound
+            switch(soundOption) {
+                case '1':
+                    alarmSound = document.getElementById('alarm-sound-1');
+                    break;
+                case '2':
+                    alarmSound = document.getElementById('alarm-sound-2');
+                    break;
+                case '3':
+                    alarmSound = document.getElementById('alarm-sound-3');
+                    break;
+                case '4':
+                    alarmSound = document.getElementById('alarm-sound-4');
+                    break;
+                case '5':
+                    // Custom sound handled separately
+                    break;
+            }
+        });
+
+        // Custom Alarm Upload
+        document.getElementById('custom-alarm-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const audio = document.getElementById('custom-alarm-sound');
+                audio.src = e.target.result;
+                alarmSound = audio;
+                
+                // Automatically select the custom option
+                document.getElementById('alarm-sound-select').value = '5';
+            };
+            reader.readAsDataURL(file);
+        });
 
         // Title Customization
         document.getElementById('title-text').addEventListener('input', function() {
@@ -463,54 +558,69 @@
         });
 
         // Title Font Size Slider
-        const titleSizeSlider = document.getElementById('title-font-size');
-        const titleSizeValue = document.getElementById('font-size-value');
-        titleSizeSlider.addEventListener('input', function() {
+        document.getElementById('title-font-size').addEventListener('input', function() {
             const size = this.value;
-            titleSizeValue.textContent = size;
+            document.getElementById('font-size-value').textContent = size;
             titleElement.style.fontSize = `${size}px`;
         });
 
-        // Title Font Selection
+        // Title Font Family Selection
         document.getElementById('title-font-select').addEventListener('change', function() {
             const fontType = this.value;
-            const uploadContainer = document.getElementById('custom-font-upload-container');
+            document.getElementById('custom-font-upload-container').classList.toggle('hidden', fontType !== 'custom');
             
-            uploadContainer.classList.toggle('hidden', fontType !== 'custom');
+            if (fontType === 'custom') return; // Handled by upload
             
-            if (fontType === 'custom') {
-                // Will be handled by custom font upload
-                return;
-            }
-            
-            // Apply selected font
             titleElement.style.fontFamily = fontType === 'Orbitron' ? 'Orbitron, sans-serif' : fontType;
+        });
+
+        // Custom Title Font Upload
+        document.getElementById('custom-font-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const fontName = `CustomTitleFont-${file.name.split('.')[0]}`;
+            const font = new FontFace(fontName, `url(${URL.createObjectURL(file)})`);
+            
+            font.load().then(() => {
+                document.fonts.add(font);
+                titleElement.style.fontFamily = fontName;
+                document.getElementById('title-font-select').value = 'custom';
+            });
         });
 
         // Clock Font Selection
         document.getElementById('clock-font-select').addEventListener('change', function() {
             const fontType = this.value;
-            const uploadContainer = document.getElementById('custom-clock-font-upload-container');
+            document.getElementById('custom-clock-font-upload-container').classList.toggle('hidden', fontType !== 'custom');
             
-            uploadContainer.classList.toggle('hidden', fontType !== 'custom');
+            if (fontType === 'custom') return;
             
-            if (fontType === 'custom') {
-                // Will be handled by custom font upload
-                return;
-            }
+            clockElement.style.fontFamily = 
+                fontType === 'Digital7' ? 'Digital7, monospace' :
+                fontType === 'Orbitron' ? 'Orbitron, sans-serif' :
+                fontType;
+        });
+
+        // Custom Clock Font Upload
+        document.getElementById('custom-clock-font-upload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
             
-            // Apply selected font
-            clockElement.style.fontFamily = fontType === 'Digital7' ? 'Digital7, monospace' : 
-                                          fontType === 'Orbitron' ? 'Orbitron, sans-serif' : 
-                                          fontType;
+            const fontName = `CustomClockFont-${file.name.split('.')[0]}`;
+            const font = new FontFace(fontName, `url(${URL.createObjectURL(file)})`);
+            
+            font.load().then(() => {
+                document.fonts.add(font);
+                clockElement.style.fontFamily = fontName;
+                document.getElementById('clock-font-select').value = 'custom';
+            });
         });
 
         // Clock Size Slider
-        const clockSizeSlider = document.getElementById('clock-font-size');
-        const clockSizeValue = document.getElementById('clock-size-value');
-        clockSizeSlider.addEventListener('input', function() {
+        document.getElementById('clock-font-size').addEventListener('input', function() {
             const size = this.value;
-            clockSizeValue.textContent = size;
+            document.getElementById('clock-size-value').textContent = size;
             clockElement.style.fontSize = `${size}px`;
         });
 
@@ -520,76 +630,26 @@
             updateDisplay();
         });
 
-        // Custom Font Upload for Title
-        document.getElementById('custom-font-upload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const fontName = `CustomTitleFont-${Date.now()}`;
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const font = new FontFace(fontName, `url(${e.target.result})`);
-                
-                font.load().then(() => {
-                    document.fonts.add(font);
-                    customFonts.title = fontName;
-                    
-                    // Apply the font
-                    titleElement.style.fontFamily = fontName;
-                    
-                    // Update the select to show custom is selected
-                    document.getElementById('title-font-select').value = 'custom';
-                    
-                    // Show preview
-                    document.getElementById('custom-font-preview').textContent = 
-                        `Using custom font: ${file.name}`;
-                });
-            };
-            
-            reader.readAsDataURL(file);
-        });
-
-        // Custom Font Upload for Clock
-        document.getElementById('custom-clock-font-upload').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (!file) return;
-            
-            const fontName = `CustomClockFont-${Date.now()}`;
-            const reader = new FileReader();
-            
-            reader.onload = function(e) {
-                const font = new FontFace(fontName, `url(${e.target.result})`);
-                
-                font.load().then(() => {
-                    document.fonts.add(font);
-                    customFonts.clock = fontName;
-                    
-                    // Apply the font
-                    clockElement.style.fontFamily = fontName;
-                    
-                    // Update the select to show custom is selected
-                    document.getElementById('clock-font-select').value = 'custom';
-                });
-            };
-            
-            reader.readAsDataURL(file);
-        });
-
-        // Toggle Settings Panel
+        // Settings Panel Toggle
         toggleBtn.addEventListener('click', () => {
             settingsPanel.classList.toggle('hidden');
-            
-            // Scroll to top of settings when opening
             if (!settingsPanel.classList.contains('hidden')) {
                 settingsPanel.scrollTo(0, 0);
             }
         });
 
-        // Control Button Event Listeners
+        // Button Event Listeners
         document.getElementById('start-btn').addEventListener('click', startTimer);
         document.getElementById('pause-btn').addEventListener('click', pauseTimer);
         document.getElementById('reset-btn').addEventListener('click', resetTimer);
+
+        // Prevent empty title
+        titleElement.addEventListener('blur', () => {
+            if (!titleElement.textContent.trim()) {
+                titleElement.textContent = 'MY COUNTDOWN';
+                document.getElementById('title-text').value = 'MY COUNTDOWN';
+            }
+        });
 
         // Initialize
         updateDisplay();
