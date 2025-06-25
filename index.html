@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Custom Font Countdown</title>
+    <title>Custom Title Font Countdown</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -25,6 +25,11 @@
         .font-mono {
             font-family: monospace;
             font-weight: bold;
+        }
+        
+        /* Title font classes */
+        .title-font-default {
+            font-family: 'Orbitron', sans-serif;
         }
         
         body {
@@ -75,7 +80,8 @@
 </head>
 <body class="flex flex-col min-h-screen">
     <div class="flex-grow container mx-auto px-4 py-8 flex flex-col">
-        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-center text-white">
+        <!-- Title with custom font option -->
+        <h1 id="countdown-title" class="text-4xl md:text-5xl font-bold mb-2 text-center text-white title-font-default">
             CUSTOM FONT COUNTDOWN
         </h1>
         
@@ -131,43 +137,72 @@
                 </div>
             </div>
             
-            <!-- Font Selection -->
-            <div>
-                <h2 class="text-2xl font-bold mb-6 text-white text-center">SELECT FONT STYLE</h2>
+            <!-- Clock Font Selection -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6 text-white text-center">SELECT CLOCK FONT</h2>
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeFont('digital')" data-font="digital">
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeClockFont('digital')" data-font="digital">
                         <div class="text-2xl md:text-3xl font-digital mb-2">00:00:00</div>
                         <span class="text-red-300">Digital</span>
                     </div>
                     
-                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeFont('orbitron')" data-font="orbitron">
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeClockFont('orbitron')" data-font="orbitron">
                         <div class="text-2xl md:text-3xl font-orbitron mb-2">00:00:00</div>
                         <span class="text-red-300">Orbitron</span>
                     </div>
                     
-                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeFont('led')" data-font="led">
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeClockFont('led')" data-font="led">
                         <div class="text-2xl md:text-3xl font-led mb-2">00:00:00</div>
                         <span class="text-red-300">LED</span>
                     </div>
                     
-                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeFont('mono')" data-font="mono">
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeClockFont('mono')" data-font="mono">
                         <div class="text-2xl md:text-3xl font-mono mb-2">00:00:00</div>
                         <span class="text-red-300">Monospace</span>
                     </div>
                 </div>
+                
+                <!-- Custom Clock Font Upload -->
+                <div class="mt-6">
+                    <input type="file" id="clock-font-upload" accept=".ttf,.otf,.woff,.woff2" class="hidden">
+                    <label for="clock-font-upload" class="cursor-pointer bg-red-700 hover:bg-red-800 text-white px-6 py-3 rounded-lg text-lg font-bold flex items-center justify-center gap-2 mb-2">
+                        <i class="fas fa-upload"></i> Upload Custom Clock Font
+                    </label>
+                    <div id="clock-font-preview" class="text-center text-red-300 hidden">
+                        <div id="custom-clock-font-display" class="text-3xl mt-2">00:00:00</div>
+                    </div>
+                </div>
             </div>
             
-            <!-- Custom Font Upload -->
-            <div class="mt-8">
-                <h2 class="text-2xl font-bold mb-4 text-white text-center">OR UPLOAD YOUR OWN FONT</h2>
-                <div class="max-w-md mx-auto bg-black bg-opacity-50 p-4 rounded-lg">
-                    <input type="file" id="font-upload" accept=".ttf,.otf,.woff,.woff2" class="hidden">
-                    <label for="font-upload" class="cursor-pointer bg-red-700 hover:bg-red-800 text-white px-6 py-3 rounded-lg text-lg font-bold flex items-center justify-center gap-2">
-                        <i class="fas fa-upload"></i> Choose Font File
+            <!-- Title Font Selection -->
+            <div>
+                <h2 class="text-2xl font-bold mb-6 text-white text-center">SELECT TITLE FONT</h2>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 mb-4">
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeTitleFont('default')" data-font="default">
+                        <div class="text-xl md:text-2xl title-font-default mb-2">COUNTDOWN</div>
+                        <span class="text-red-300">Default</span>
+                    </div>
+                    
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeTitleFont('digital')" data-font="digital">
+                        <div class="text-xl md:text-2xl font-digital mb-2">COUNTDOWN</div>
+                        <span class="text-red-300">Digital</span>
+                    </div>
+                    
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeTitleFont('orbitron')" data-font="orbitron">
+                        <div class="text-xl md:text-2xl font-orbitron mb-2">COUNTDOWN</div>
+                        <span class="text-red-300">Orbitron</span>
+                    </div>
+                </div>
+                
+                <!-- Custom Title Font Upload -->
+                <div class="mt-6">
+                    <input type="file" id="title-font-upload" accept=".ttf,.otf,.woff,.woff2" class="hidden">
+                    <label for="title-font-upload" class="cursor-pointer bg-red-700 hover:bg-red-800 text-white px-6 py-3 rounded-lg text-lg font-bold flex items-center justify-center gap-2 mb-2">
+                        <i class="fas fa-upload"></i> Upload Custom Title Font
                     </label>
-                    <div id="font-preview" class="mt-4 text-center text-red-300 hidden">
-                        <p>Custom font preview:</p>
-                        <div id="custom-font-display" class="text-3xl mt-2">00:00:00</div>
+                    <div id="title-font-preview" class="text-center text-red-300 hidden">
+                        <p class="mb-2">Title Preview:</p>
+                        <div id="custom-title-font-display" class="text-2xl">CUSTOM TITLE</div>
                     </div>
                 </div>
             </div>
@@ -203,62 +238,86 @@
         let remainingSeconds = 0;
         let timerInterval;
         let isRunning = false;
-        let currentFont = 'digital';
+        let clockFont = 'digital';
+        let titleFont = 'default';
         
         // DOM Elements
         const clockDisplay = document.getElementById('clock-display');
+        const titleDisplay = document.getElementById('countdown-title');
         const hoursElement = document.getElementById('hours');
         const minutesElement = document.getElementById('minutes');
         const secondsElement = document.getElementById('seconds');
         
-        const hoursInput = document.getElementById('input-hours');
-        const minutesInput = document.getElementById('input-minutes');
-        const secondsInput = document.getElementById('input-seconds');
-        
+        // Timer control elements...
         const startBtn = document.getElementById('start-btn');
         const pauseBtn = document.getElementById('pause-btn');
         const resetBtn = document.getElementById('reset-btn');
         
-        const completeMessage = document.getElementById('complete-message');
-        const tickSound = document.getElementById('tick-sound');
-        const alarmSound = document.getElementById('alarm-sound');
+        // Font upload elements
+        const clockFontUpload = document.getElementById('clock-font-upload');
+        const titleFontUpload = document.getElementById('title-font-upload');
         
-        const fontUpload = document.getElementById('font-upload');
-        const fontPreview = document.getElementById('font-preview');
-        const customFontDisplay = document.getElementById('custom-font-display');
-        
-        // Change font function
-        function changeFont(fontType) {
-            currentFont = fontType;
+        // Change clock font function
+        function changeClockFont(fontType) {
+            clockFont = fontType;
             
             // Remove all font classes
-            clockDisplay.classList.remove('font-digital', 'font-orbitron', 'font-led', 'font-mono', 'custom-font');
+            clockDisplay.classList.remove('font-digital', 'font-orbitron', 'font-led', 'font-mono', 'custom-clock-font');
             
             // Add selected font class
             if (fontType === 'custom') {
-                clockDisplay.classList.add('custom-font');
+                clockDisplay.classList.add('custom-clock-font');
             } else {
                 clockDisplay.classList.add(`font-${fontType}`);
             }
             
             // Update selected state in UI
-            document.querySelectorAll('.font-option').forEach(option => {
-                option.classList.remove('selected');
-                if (option.dataset.font === fontType) {
-                    option.classList.add('selected');
+            document.querySelectorAll('[data-font]').forEach(option => {
+                if (option.closest('#clock-font-selection')) {
+                    option.classList.remove('selected');
+                    if (option.dataset.font === fontType) {
+                        option.classList.add('selected');
+                    }
                 }
             });
         }
         
-        // Handle font upload
-        fontUpload.addEventListener('change', function(e) {
+        // Change title font function
+        function changeTitleFont(fontType) {
+            titleFont = fontType;
+            
+            // Remove all font classes
+            titleDisplay.classList.remove('title-font-default', 'font-digital', 'font-orbitron', 'custom-title-font');
+            
+            // Add selected font class
+            if (fontType === 'custom') {
+                titleDisplay.classList.add('custom-title-font');
+            } else if (fontType === 'default') {
+                titleDisplay.classList.add('title-font-default');
+            } else {
+                titleDisplay.classList.add(`font-${fontType}`);
+            }
+            
+            // Update selected state in UI
+            document.querySelectorAll('[data-font]').forEach(option => {
+                if (option.closest('#title-font-selection')) {
+                    option.classList.remove('selected');
+                    if (option.dataset.font === fontType) {
+                        option.classList.add('selected');
+                    }
+                }
+            });
+        }
+        
+        // Handle clock font upload
+        clockFontUpload.addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
             
             const reader = new FileReader();
             reader.onload = function(e) {
                 const fontData = e.target.result;
-                const fontName = file.name.split('.')[0];
+                const fontName = `ClockFont-${file.name.split('.')[0]}`;
                 
                 // Create custom font
                 const customFont = new FontFace(fontName, `url(${fontData})`);
@@ -269,25 +328,69 @@
                     // Apply custom font style
                     const style = document.createElement('style');
                     style.textContent = `
-                        .custom-font {
+                        .custom-clock-font {
                             font-family: "${fontName}", sans-serif;
                             text-shadow: 0 0 10px #ff3333;
+                        }
+                        
+                        #custom-clock-font-display {
+                            font-family: "${fontName}", sans-serif;
                         }
                     `;
                     document.head.appendChild(style);
                     
                     // Show preview
-                    customFontDisplay.style.fontFamily = `"${fontName}", sans-serif`;
-                    fontPreview.classList.remove('hidden');
+                    document.getElementById('custom-clock-font-display').style.fontFamily = `"${fontName}", sans-serif`;
+                    document.getElementById('clock-font-preview').classList.remove('hidden');
                     
                     // Change to custom font
-                    changeFont('custom');
+                    changeClockFont('custom');
                 });
             };
             reader.readAsDataURL(file);
         });
         
-        // Timer functions remain the same as before...
+        // Handle title font upload
+        titleFontUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fontData = e.target.result;
+                const fontName = `TitleFont-${file.name.split('.')[0]}`;
+                
+                // Create custom font
+                const customFont = new FontFace(fontName, `url(${fontData})`);
+                
+                customFont.load().then(() => {
+                    document.fonts.add(customFont);
+                    
+                    // Apply custom font style
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .custom-title-font {
+                            font-family: "${fontName}", sans-serif;
+                        }
+                        
+                        #custom-title-font-display {
+                            font-family: "${fontName}", sans-serif;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    // Show preview
+                    document.getElementById('custom-title-font-display').style.fontFamily = `"${fontName}", sans-serif`;
+                    document.getElementById('title-font-preview').classList.remove('hidden');
+                    
+                    // Change to custom font
+                    changeTitleFont('custom');
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // Timer functions (same as before)...
         function updateDisplay() {
             const hours = Math.floor(remainingSeconds / 3600);
             const minutes = Math.floor((remainingSeconds % 3600) / 60);
@@ -298,12 +401,12 @@
             secondsElement.textContent = seconds.toString().padStart(2, '0');
         }
         
-        function startTimer() {
+                function startTimer() {
             if (isRunning) return;
             
-            const hours = parseInt(hoursInput.value) || 0;
-            const minutes = parseInt(minutesInput.value) || 0;
-            const seconds = parseInt(secondsInput.value) || 0;
+            const hours = parseInt(document.getElementById('input-hours').value) || 0;
+            const minutes = parseInt(document.getElementById('input-minutes').value) || 0;
+            const seconds = parseInt(document.getElementById('input-seconds').value) || 0;
             
             totalSeconds = hours * 3600 + minutes * 60 + seconds;
             remainingSeconds = totalSeconds;
@@ -316,17 +419,17 @@
             isRunning = true;
             updateDisplay();
             
-            startBtn.disabled = true;
-            pauseBtn.disabled = false;
-            completeMessage.classList.add('hidden');
+            document.getElementById('start-btn').disabled = true;
+            document.getElementById('pause-btn').disabled = false;
+            document.getElementById('complete-message').classList.add('hidden');
             
             timerInterval = setInterval(() => {
                 remainingSeconds--;
                 updateDisplay();
                 
                 if (remainingSeconds > 0) {
-                    tickSound.currentTime = 0;
-                    tickSound.play();
+                    document.getElementById('tick-sound').currentTime = 0;
+                    document.getElementById('tick-sound').play();
                 }
                 
                 if (remainingSeconds <= 0) {
@@ -342,8 +445,8 @@
             
             clearInterval(timerInterval);
             isRunning = false;
-            startBtn.disabled = false;
-            pauseBtn.disabled = true;
+            document.getElementById('start-btn').disabled = false;
+            document.getElementById('pause-btn').disabled = true;
         }
         
         function resetTimer() {
@@ -355,16 +458,16 @@
             
             updateDisplay();
             
-            startBtn.disabled = false;
-            pauseBtn.disabled = true;
-            completeMessage.classList.add('hidden');
+            document.getElementById('start-btn').disabled = false;
+            document.getElementById('pause-btn').disabled = true;
+            document.getElementById('complete-message').classList.add('hidden');
         }
         
         function completeTimer() {
-            alarmSound.play();
-            completeMessage.classList.remove('hidden');
-            startBtn.disabled = false;
-            pauseBtn.disabled = true;
+            document.getElementById('alarm-sound').play();
+            document.getElementById('complete-message').classList.remove('hidden');
+            document.getElementById('start-btn').disabled = false;
+            document.getElementById('pause-btn').disabled = true;
             
             // Flash effect
             let flashCount = 0;
@@ -381,13 +484,24 @@
         }
         
         // Event listeners
-        startBtn.addEventListener('click', startTimer);
-        pauseBtn.addEventListener('click', pauseTimer);
-        resetBtn.addEventListener('click', resetTimer);
+        document.getElementById('start-btn').addEventListener('click', startTimer);
+        document.getElementById('pause-btn').addEventListener('click', pauseTimer);
+        document.getElementById('reset-btn').addEventListener('click', resetTimer);
         
-        // Initialize with digital font
-        changeFont('digital');
+        // Initialize
+        changeClockFont('digital');
+        changeTitleFont('default');
         updateDisplay();
+
+        // Helper function to toggle selected state for font options
+        function toggleSelectedState(selector, fontType) {
+            document.querySelectorAll(selector).forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.font === fontType) {
+                    option.classList.add('selected');
+                }
+            });
+        }
     </script>
 </body>
 </html>
