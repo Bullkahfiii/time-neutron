@@ -10,13 +10,14 @@
         /* Custom Font Definitions */
         @font-face {
             font-family: 'Digital7';
-            src: url('https://fonts.cdnfonts.com/css/digital-7-mono') format('truetype');
+            src: url('https://raw.githubusercontent.com/Bullkahfiii/time-neutron/main/assets/fonts/Quadrat%20Serial%20Bold.otf');
         }
         @font-face {
             font-family: 'Orbitron';
             src: url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
         }
-        
+
+
         /* Main Styles */
         body {
             background-color: #ffffff;
@@ -348,7 +349,7 @@
     <audio id="tick-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-tick-tock-clock-timer-1045.mp3" preload="auto"></audio>
     
     <!-- Multiple Alarm Sounds -->
-    <audio id="alarm-sound-1" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
+    <audio id="alarm-sound-1" src="http://raw.githubusercontent.com/Bullkahfiii/time-neutron/main/assets/sounds/sound.wav" preload="auto"></audio>
     <audio id="alarm-sound-2" src="https://assets.mixkit.co/sfx/preview/mixkit-interface-hint-notification-911.mp3" preload="auto"></audio>
     <audio id="alarm-sound-3" src="https://assets.mixkit.co/sfx/preview/mixkit-digital-clock-digital-alarm-buzzer-992.mp3" preload="auto"></audio>
     <audio id="alarm-sound-4" src="https://assets.mixkit.co/sfx/preview/mixkit-bell-notification-933.mp3" preload="auto"></audio>
@@ -357,7 +358,7 @@
     <script>
         // Load fonts dynamically
         function loadFonts() {
-            const digitalFont = new FontFace('Digital7', 'url(https://fonts.cdnfonts.com/css/digital-7-mono)');
+            const digitalFont = new FontFace('Digital7', 'url(https://raw.githubusercontent.com/Bullkahfiii/time-neutron/main/assets/fonts/Quadrat%20Serial%20Bold.otf)');
             const orbitronFont = new FontFace('Orbitron', 'url(https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap)');
             
             digitalFont.load().then(font => document.fonts.add(font));
