@@ -3,40 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Analog Style Countdown</title>
+    <title>Custom Font Countdown</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        @font-face {
-            font-family: 'Digital';
-            src: url('https://fonts.cdnfonts.com/css/digital-7-mono');
+        /* Default font styles */
+        .font-digital {
+            font-family: 'Digital', sans-serif;
+            text-shadow: 0 0 10px #ff3333;
+        }
+        
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+            letter-spacing: 2px;
+        }
+        
+        .font-led {
+            font-family: 'LED', sans-serif;
+        }
+        
+        .font-mono {
+            font-family: monospace;
+            font-weight: bold;
         }
         
         body {
-            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            background: linear-gradient(to bottom, #1a0000, #4d0000);
             min-height: 100vh;
-            font-family: 'Orbitron', sans-serif;
             color: #fff;
-            overflow: hidden;
         }
         
         .clock {
-            font-family: 'Digital', sans-serif;
-            position: relative;
-            text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
-        }
-        
-        .clock::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0, 255, 255, 0.1) 70%);
-            z-index: -1;
-            border-radius: 20px;
+            color: #ff3333;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.5);
         }
         
         .colon {
@@ -48,99 +50,163 @@
             50% { opacity: 0.3; }
         }
         
-        .glow {
-            box-shadow: 0 0 15px #0ff, 0 0 30px #0ff;
-        }
-        
-        .button {
-            transition: all 0.3s ease;
-        }
-        
-        .button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
-        }
-        
         .input-field {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff3333;
             color: white;
+            text-align: center;
         }
         
-        .progress-ring {
-            transform: rotate(-90deg);
+        .font-option {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
         }
         
-        .progress-ring__circle {
-            transition: stroke-dashoffset 0.5s;
-            transform-origin: 50% 50%;
+        .font-option:hover {
+            transform: scale(1.05);
+            border-color: #ff3333;
+        }
+        
+        .font-option.selected {
+            border-color: #ff3333;
+            box-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-center p-4">
-    <div class="w-full max-w-4xl text-center">
-        <h1 class="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
-            Countdown Timer
+<body class="flex flex-col min-h-screen">
+    <div class="flex-grow container mx-auto px-4 py-8 flex flex-col">
+        <h1 class="text-4xl md:text-5xl font-bold mb-2 text-center text-white">
+            CUSTOM FONT COUNTDOWN
         </h1>
         
-        <div class="mb-10 flex justify-center">
-            <svg width="300" height="300" class="progress-ring">
-                <circle class="progress-ring__circle" stroke="rgba(0, 255, 255, 0.3)" stroke-width="6" fill="transparent" 
-                        r="140" cx="150" cy="150" stroke-dasharray="880" stroke-dashoffset="0"/>
-                <circle class="progress-ring__circle" stroke="#0ff" stroke-width="8" fill="transparent" 
-                        r="140" cx="150" cy="150" stroke-dasharray="880" stroke-dashoffset="880"/>
-            </svg>
-        </div>
-        
-        <div class="clock text-8xl md:text-9xl font-bold mb-10 glow p-8 rounded-2xl bg-black bg-opacity-30">
-            <span id="hours">00</span>
-            <span class="colon">:</span>
-            <span id="minutes">00</span>
-            <span class="colon">:</span>
-            <span id="seconds">00</span>
-        </div>
-        
-        <div class="controls flex flex-col space-y-6 md:flex-row md:space-y-0 md:space-x-6 justify-center mb-10">
-            <div class="input-group flex flex-col items-center">
-                <label class="mb-2 text-lg">Hours</label>
-                <input type="number" id="input-hours" min="0" max="23" class="input-field rounded-lg p-3 w-24 text-center" value="0">
+        <div class="flex-grow flex flex-col justify-center items-center mb-8">
+            <!-- Main Clock Display -->
+            <div id="clock-display" class="clock text-7xl md:text-8xl lg:text-9xl font-bold mb-10 p-6 lg:p-10 relative font-digital">
+                <span id="hours">00</span>
+                <span class="colon">:</span>
+                <span id="minutes">00</span>
+                <span class="colon">:</span>
+                <span id="seconds">00</span>
             </div>
-            <div class="input-group flex flex-col items-center">
-                <label class="mb-2 text-lg">Minutes</label>
-                <input type="number" id="input-minutes" min="0" max="59" class="input-field rounded-lg p-3 w-24 text-center" value="10">
+            
+            <!-- Completion Message -->
+            <div id="complete-message" class="hidden text-4xl font-bold mb-8 text-red-400">
+                TIME'S UP!
             </div>
-            <div class="input-group flex flex-col items-center">
-                <label class="mb-2 text-lg">Seconds</label>
-                <input type="number" id="input-seconds" min="0" max="59" class="input-field rounded-lg p-3 w-24 text-center" value="0">
+            
+            <!-- Control Buttons -->
+            <div class="flex flex-wrap justify-center gap-4 mb-10">
+                <button id="start-btn" class="bg-red-700 hover:bg-red-800 text-white px-6 py-3 rounded-lg text-lg font-bold flex items-center gap-2">
+                    <i class="fas fa-play"></i> Start
+                </button>
+                <button id="pause-btn" class="bg-red-800 hover:bg-red-900 text-white px-6 py-3 rounded-lg text-lg font-bold flex items-center gap-2" disabled>
+                    <i class="fas fa-pause"></i> Pause
+                </button>
+                <button id="reset-btn" class="bg-red-900 hover:bg-red-950 text-white px-6 py-3 rounded-lg text-lg font-bold flex items-center gap-2">
+                    <i class="fas fa-redo"></i> Reset
+                </button>
             </div>
         </div>
-        
-        <div class="flex flex-wrap justify-center gap-4 mb-8">
-            <button id="start-btn" class="button bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full text-lg font-bold flex items-center gap-2">
-                <i class="fas fa-play"></i> Start
-            </button>
-            <button id="pause-btn" class="button bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-full text-lg font-bold flex items-center gap-2" disabled>
-                <i class="fas fa-pause"></i> Pause
-            </button>
-            <button id="reset-btn" class="button bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-full text-lg font-bold flex items-center gap-2">
-                <i class="fas fa-redo"></i> Reset
-            </button>
+    </div>
+    
+    <!-- Settings Panel -->
+    <div class="bg-black bg-opacity-70 border-t-2 border-red-900 p-6">
+        <div class="max-w-4xl mx-auto">
+            <!-- Time Settings -->
+            <div class="mb-8">
+                <h2 class="text-2xl font-bold mb-6 text-white text-center">SET COUNTDOWN TIME</h2>
+                <div class="grid grid-cols-3 gap-6 mb-4">
+                    <div class="flex flex-col items-center">
+                        <label class="mb-2 text-lg font-medium text-red-300">Hours</label>
+                        <input type="number" id="input-hours" min="0" max="23" class="input-field rounded-lg p-3 w-full text-xl" value="0">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <label class="mb-2 text-lg font-medium text-red-300">Minutes</label>
+                        <input type="number" id="input-minutes" min="0" max="59" class="input-field rounded-lg p-3 w-full text-xl" value="10">
+                    </div>
+                    <div class="flex flex-col items-center">
+                        <label class="mb-2 text-lg font-medium text-red-300">Seconds</label>
+                        <input type="number" id="input-seconds" min="0" max="59" class="input-field rounded-lg p-3 w-full text-xl" value="0">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Font Selection -->
+            <div>
+                <h2 class="text-2xl font-bold mb-6 text-white text-center">SELECT FONT STYLE</h2>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeFont('digital')" data-font="digital">
+                        <div class="text-2xl md:text-3xl font-digital mb-2">00:00:00</div>
+                        <span class="text-red-300">Digital</span>
+                    </div>
+                    
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeFont('orbitron')" data-font="orbitron">
+                        <div class="text-2xl md:text-3xl font-orbitron mb-2">00:00:00</div>
+                        <span class="text-red-300">Orbitron</span>
+                    </div>
+                    
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeFont('led')" data-font="led">
+                        <div class="text-2xl md:text-3xl font-led mb-2">00:00:00</div>
+                        <span class="text-red-300">LED</span>
+                    </div>
+                    
+                    <div class="font-option cursor-pointer p-4 rounded-lg bg-black bg-opacity-50 text-center" onclick="changeFont('mono')" data-font="mono">
+                        <div class="text-2xl md:text-3xl font-mono mb-2">00:00:00</div>
+                        <span class="text-red-300">Monospace</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Custom Font Upload -->
+            <div class="mt-8">
+                <h2 class="text-2xl font-bold mb-4 text-white text-center">OR UPLOAD YOUR OWN FONT</h2>
+                <div class="max-w-md mx-auto bg-black bg-opacity-50 p-4 rounded-lg">
+                    <input type="file" id="font-upload" accept=".ttf,.otf,.woff,.woff2" class="hidden">
+                    <label for="font-upload" class="cursor-pointer bg-red-700 hover:bg-red-800 text-white px-6 py-3 rounded-lg text-lg font-bold flex items-center justify-center gap-2">
+                        <i class="fas fa-upload"></i> Choose Font File
+                    </label>
+                    <div id="font-preview" class="mt-4 text-center text-red-300 hidden">
+                        <p>Custom font preview:</p>
+                        <div id="custom-font-display" class="text-3xl mt-2">00:00:00</div>
+                    </div>
+                </div>
+            </div>
         </div>
-        
-        <div id="complete-message" class="hidden text-4xl text-green-400 font-bold mb-6 animate-pulse">
-            Countdown Complete!
-        </div>
-        
-        <audio id="tick-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-tick-tock-clock-timer-1045.mp3" preload="auto"></audio>
-        <audio id="alarm-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
     </div>
 
+    <!-- Audio Elements -->
+    <audio id="tick-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-tick-tock-clock-timer-1045.mp3" preload="auto"></audio>
+    <audio id="alarm-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
+
     <script>
+        // Load fonts dynamically
+        function loadFonts() {
+            // Digital font
+            const digitalFont = new FontFace('Digital', 'url(https://fonts.cdnfonts.com/css/digital-7-mono)');
+            digitalFont.load().then(() => document.fonts.add(digitalFont));
+            
+            // Orbitron font
+            const orbitronLink = document.createElement('link');
+            orbitronLink.href = 'https://fonts.googleapis.com/css2?family=Orbitron:wght@900&display=swap';
+            orbitronLink.rel = 'stylesheet';
+            document.head.appendChild(orbitronLink);
+            
+            // LED font (simulated with another digital font)
+            const ledFont = new FontFace('LED', 'url(https://fonts.cdnfonts.com/css/led-counter-7)');
+            ledFont.load().then(() => document.fonts.add(ledFont));
+        }
+        
+        // Initialize
+        loadFonts();
+        
         let totalSeconds = 0;
         let remainingSeconds = 0;
         let timerInterval;
         let isRunning = false;
+        let currentFont = 'digital';
         
+        // DOM Elements
+        const clockDisplay = document.getElementById('clock-display');
         const hoursElement = document.getElementById('hours');
         const minutesElement = document.getElementById('minutes');
         const secondsElement = document.getElementById('seconds');
@@ -157,11 +223,71 @@
         const tickSound = document.getElementById('tick-sound');
         const alarmSound = document.getElementById('alarm-sound');
         
-        const progressCircle = document.querySelector('.progress-ring__circle:nth-child(2)');
-        const circumference = 2 * Math.PI * 140;
+        const fontUpload = document.getElementById('font-upload');
+        const fontPreview = document.getElementById('font-preview');
+        const customFontDisplay = document.getElementById('custom-font-display');
         
-        progressCircle.style.strokeDasharray = circumference;
+        // Change font function
+        function changeFont(fontType) {
+            currentFont = fontType;
+            
+            // Remove all font classes
+            clockDisplay.classList.remove('font-digital', 'font-orbitron', 'font-led', 'font-mono', 'custom-font');
+            
+            // Add selected font class
+            if (fontType === 'custom') {
+                clockDisplay.classList.add('custom-font');
+            } else {
+                clockDisplay.classList.add(`font-${fontType}`);
+            }
+            
+            // Update selected state in UI
+            document.querySelectorAll('.font-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.font === fontType) {
+                    option.classList.add('selected');
+                }
+            });
+        }
         
+        // Handle font upload
+        fontUpload.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const fontData = e.target.result;
+                const fontName = file.name.split('.')[0];
+                
+                // Create custom font
+                const customFont = new FontFace(fontName, `url(${fontData})`);
+                
+                customFont.load().then(() => {
+                    document.fonts.add(customFont);
+                    
+                    // Apply custom font style
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .custom-font {
+                            font-family: "${fontName}", sans-serif;
+                            text-shadow: 0 0 10px #ff3333;
+                        }
+                    `;
+                    document.head.appendChild(style);
+                    
+                    // Show preview
+                    customFontDisplay.style.fontFamily = `"${fontName}", sans-serif`;
+                    fontPreview.classList.remove('hidden');
+                    
+                    // Change to custom font
+                    changeFont('custom');
+                });
+            };
+            reader.readAsDataURL(file);
+        });
+        
+        // Timer functions remain the same as before...
         function updateDisplay() {
             const hours = Math.floor(remainingSeconds / 3600);
             const minutes = Math.floor((remainingSeconds % 3600) / 60);
@@ -170,12 +296,6 @@
             hoursElement.textContent = hours.toString().padStart(2, '0');
             minutesElement.textContent = minutes.toString().padStart(2, '0');
             secondsElement.textContent = seconds.toString().padStart(2, '0');
-            
-            // Update progress ring
-            if (totalSeconds > 0) {
-                const progress = (remainingSeconds / totalSeconds) * circumference;
-                progressCircle.style.strokeDashoffset = progress;
-            }
         }
         
         function startTimer() {
@@ -204,7 +324,6 @@
                 remainingSeconds--;
                 updateDisplay();
                 
-                // Play tick sound every second
                 if (remainingSeconds > 0) {
                     tickSound.currentTime = 0;
                     tickSound.play();
@@ -239,8 +358,6 @@
             startBtn.disabled = false;
             pauseBtn.disabled = true;
             completeMessage.classList.add('hidden');
-            
-            progressCircle.style.strokeDashoffset = circumference;
         }
         
         function completeTimer() {
@@ -248,51 +365,28 @@
             completeMessage.classList.remove('hidden');
             startBtn.disabled = false;
             pauseBtn.disabled = true;
-            progressCircle.style.strokeDashoffset = 0;
             
-            // Add confetti effect
-            for (let i = 0; i < 100; i++) {
-                createConfetti();
-            }
+            // Flash effect
+            let flashCount = 0;
+            const maxFlashes = 6;
+            const flashInterval = setInterval(() => {
+                document.body.style.backgroundColor = flashCount % 2 === 0 ? '#330000' : '#1a0000';
+                flashCount++;
+                
+                if (flashCount > maxFlashes) {
+                    clearInterval(flashInterval);
+                    document.body.style.backgroundColor = '';
+                }
+            }, 300);
         }
         
-        function createConfetti() {
-            const confetti = document.createElement('div');
-            confetti.style.position = 'fixed';
-            confetti.style.width = '10px';
-            confetti.style.height = '10px';
-            confetti.style.backgroundColor = getRandomColor();
-            confetti.style.borderRadius = '50%';
-            confetti.style.top = '0';
-            confetti.style.left = Math.random() * window.innerWidth + 'px';
-            confetti.style.zIndex = '1000';
-            confetti.style.pointerEvents = 'none';
-            
-            document.body.appendChild(confetti);
-            
-            const animation = confetti.animate([
-                { top: '0', opacity: 1, transform: 'rotate(0deg)' },
-                { top: window.innerHeight + 'px', opacity: 0, transform: 'rotate(360deg)' }
-            ], {
-                duration: Math.random() * 3000 + 2000,
-                easing: 'cubic-bezier(0.1, 0.8, 0.9, 1)'
-            });
-            
-            animation.onfinish = () => {
-                confetti.remove();
-            };
-        }
-        
-        function getRandomColor() {
-            const colors = ['#0ff', '#f0f', '#ff0', '#0f0', '#00f'];
-            return colors[Math.floor(Math.random() * colors.length)];
-        }
-        
+        // Event listeners
         startBtn.addEventListener('click', startTimer);
         pauseBtn.addEventListener('click', pauseTimer);
         resetBtn.addEventListener('click', resetTimer);
         
-        // Initial update
+        // Initialize with digital font
+        changeFont('digital');
         updateDisplay();
     </script>
 </body>
