@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analog Style Countdown</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        @font-face {
+            font-family: 'Digital';
+            src: url('https://fonts.cdnfonts.com/css/digital-7-mono');
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            min-height: 100vh;
+            font-family: 'Orbitron', sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+        
+        .clock {
+            font-family: 'Digital', sans-serif;
+            position: relative;
+            text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+        }
+        
+        .clock::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0, 255, 255, 0.1) 70%);
+            z-index: -1;
+            border-radius: 20px;
+        }
+        
+        .colon {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        .glow {
+            box-shadow: 0 0 15px #0ff, 0 0 30px #0ff;
+        }
+        
+        .button {
+            transition: all 0.3s ease;
+        }
+        
+        .button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 255, 255, 0.4);
+        }
+        
+        .input-field {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+        
+        .progress-ring {
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.5s;
+            transform-origin: 50% 50%;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center p-4">
+    <div class="w-full max-w-4xl text-center">
+        <h1 class="text-4xl md:text-5xl font-bold mb-8 text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">
+            Countdown Timer
+        </h1>
+        
+        <div class="mb-10 flex justify-center">
+            <svg width="300" height="300" class="progress-ring">
+                <circle class="progress-ring__circle" stroke="rgba(0, 255, 255, 0.3)" stroke-width="6" fill="transparent" 
+                        r="140" cx="150" cy="150" stroke-dasharray="880" stroke-dashoffset="0"/>
+                <circle class="progress-ring__circle" stroke="#0ff" stroke-width="8" fill="transparent" 
+                        r="140" cx="150" cy="150" stroke-dasharray="880" stroke-dashoffset="880"/>
+            </svg>
+        </div>
+        
+        <div class="clock text-8xl md:text-9xl font-bold mb-10 glow p-8 rounded-2xl bg-black bg-opacity-30">
+            <span id="hours">00</span>
+            <span class="colon">:</span>
+            <span id="minutes">00</span>
+            <span class="colon">:</span>
+            <span id="seconds">00</span>
+        </div>
+        
+        <div class="controls flex flex-col space-y-6 md:flex-row md:space-y-0 md:space-x-6 justify-center mb-10">
+            <div class="input-group flex flex-col items-center">
+                <label class="mb-2 text-lg">Hours</label>
+                <input type="number" id="input-hours" min="0" max="23" class="input-field rounded-lg p-3 w-24 text-center" value="0">
+            </div>
+            <div class="input-group flex flex-col items-center">
+                <label class="mb-2 text-lg">Minutes</label>
+                <input type="number" id="input-minutes" min="0" max="59" class="input-field rounded-lg p-3 w-24 text-center" value="10">
+            </div>
+            <div class="input-group flex flex-col items-center">
+                <label class="mb-2 text-lg">Seconds</label>
+                <input type="number" id="input-seconds" min="0" max="59" class="input-field rounded-lg p-3 w-24 text-center" value="0">
+            </div>
+        </div>
+        
+        <div class="flex flex-wrap justify-center gap-4 mb-8">
+            <button id="start-btn" class="button bg-green-500 hover:bg-green-600 text-white px-8 py-3 rounded-full text-lg font-bold flex items-center gap-2">
+                <i class="fas fa-play"></i> Start
+            </button>
+            <button id="pause-btn" class="button bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 rounded-full text-lg font-bold flex items-center gap-2" disabled>
+                <i class="fas fa-pause"></i> Pause
+            </button>
+            <button id="reset-btn" class="button bg-red-500 hover:bg-red-600 text-white px-8 py-3 rounded-full text-lg font-bold flex items-center gap-2">
+                <i class="fas fa-redo"></i> Reset
+            </button>
+        </div>
+        
+        <div id="complete-message" class="hidden text-4xl text-green-400 font-bold mb-6 animate-pulse">
+            Countdown Complete!
+        </div>
+        
+        <audio id="tick-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-tick-tock-clock-timer-1045.mp3" preload="auto"></audio>
+        <audio id="alarm-sound" src="https://assets.mixkit.co/sfx/preview/mixkit-alarm-digital-clock-beep-989.mp3" preload="auto"></audio>
+    </div>
+
+    <script>
+        let totalSeconds = 0;
+        let remainingSeconds = 0;
+        let timerInterval;
+        let isRunning = false;
+        
+        const hoursElement = document.getElementById('hours');
+        const minutesElement = document.getElementById('minutes');
+        const secondsElement = document.getElementById('seconds');
+        
+        const hoursInput = document.getElementById('input-hours');
+        const minutesInput = document.getElementById('input-minutes');
+        const secondsInput = document.getElementById('input-seconds');
+        
+        const startBtn = document.getElementById('start-btn');
+        const pauseBtn = document.getElementById('pause-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        
+        const completeMessage = document.getElementById('complete-message');
+        const tickSound = document.getElementById('tick-sound');
+        const alarmSound = document.getElementById('alarm-sound');
+        
+        const progressCircle = document.querySelector('.progress-ring__circle:nth-child(2)');
+        const circumference = 2 * Math.PI * 140;
+        
+        progressCircle.style.strokeDasharray = circumference;
+        
+        function updateDisplay() {
+            const hours = Math.floor(remainingSeconds / 3600);
+            const minutes = Math.floor((remainingSeconds % 3600) / 60);
+            const seconds = remainingSeconds % 60;
+            
+            hoursElement.textContent = hours.toString().padStart(2, '0');
+            minutesElement.textContent = minutes.toString().padStart(2, '0');
+            secondsElement.textContent = seconds.toString().padStart(2, '0');
+            
+            // Update progress ring
+            if (totalSeconds > 0) {
+                const progress = (remainingSeconds / totalSeconds) * circumference;
+                progressCircle.style.strokeDashoffset = progress;
+            }
+        }
+        
+        function startTimer() {
+            if (isRunning) return;
+            
+            const hours = parseInt(hoursInput.value) || 0;
+            const minutes = parseInt(minutesInput.value) || 0;
+            const seconds = parseInt(secondsInput.value) || 0;
+            
+            totalSeconds = hours * 3600 + minutes * 60 + seconds;
+            remainingSeconds = totalSeconds;
+            
+            if (totalSeconds <= 0) {
+                alert('Please set a valid time greater than zero');
+                return;
+            }
+            
+            isRunning = true;
+            updateDisplay();
+            
+            startBtn.disabled = true;
+            pauseBtn.disabled = false;
+            completeMessage.classList.add('hidden');
+            
+            timerInterval = setInterval(() => {
+                remainingSeconds--;
+                updateDisplay();
+                
+                // Play tick sound every second
+                if (remainingSeconds > 0) {
+                    tickSound.currentTime = 0;
+                    tickSound.play();
+                }
+                
+                if (remainingSeconds <= 0) {
+                    clearInterval(timerInterval);
+                    isRunning = false;
+                    completeTimer();
+                }
+            }, 1000);
+        }
+        
+        function pauseTimer() {
+            if (!isRunning) return;
+            
+            clearInterval(timerInterval);
+            isRunning = false;
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+        }
+        
+        function resetTimer() {
+            clearInterval(timerInterval);
+            isRunning = false;
+            
+            remainingSeconds = 0;
+            totalSeconds = 0;
+            
+            updateDisplay();
+            
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            completeMessage.classList.add('hidden');
+            
+            progressCircle.style.strokeDashoffset = circumference;
+        }
+        
+        function completeTimer() {
+            alarmSound.play();
+            completeMessage.classList.remove('hidden');
+            startBtn.disabled = false;
+            pauseBtn.disabled = true;
+            progressCircle.style.strokeDashoffset = 0;
+            
+            // Add confetti effect
+            for (let i = 0; i < 100; i++) {
+                createConfetti();
+            }
+        }
+        
+        function createConfetti() {
+            const confetti = document.createElement('div');
+            confetti.style.position = 'fixed';
+            confetti.style.width = '10px';
+            confetti.style.height = '10px';
+            confetti.style.backgroundColor = getRandomColor();
+            confetti.style.borderRadius = '50%';
+            confetti.style.top = '0';
+            confetti.style.left = Math.random() * window.innerWidth + 'px';
+            confetti.style.zIndex = '1000';
+            confetti.style.pointerEvents = 'none';
+            
+            document.body.appendChild(confetti);
+            
+            const animation = confetti.animate([
+                { top: '0', opacity: 1, transform: 'rotate(0deg)' },
+                { top: window.innerHeight + 'px', opacity: 0, transform: 'rotate(360deg)' }
+            ], {
+                duration: Math.random() * 3000 + 2000,
+                easing: 'cubic-bezier(0.1, 0.8, 0.9, 1)'
+            });
+            
+            animation.onfinish = () => {
+                confetti.remove();
+            };
+        }
+        
+        function getRandomColor() {
+            const colors = ['#0ff', '#f0f', '#ff0', '#0f0', '#00f'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+        
+        startBtn.addEventListener('click', startTimer);
+        pauseBtn.addEventListener('click', pauseTimer);
+        resetBtn.addEventListener('click', resetTimer);
+        
+        // Initial update
+        updateDisplay();
+    </script>
+</body>
+</html>
